@@ -1,0 +1,25 @@
+[
+  {
+    "chatId": -1002371025024,
+    "chatName": "Бот",
+    "isAdmin": false,
+    "isGroup": true,
+    "admins": [
+      {
+        "id": 677128727,
+        "isBot": false,
+        "first_name": "Илюша"
+      }
+    ],
+    "bannedUsers": [],
+    "streets": []
+  },
+  {
+    "chatId": 677128727,
+    "isAdmin": false,
+    "isGroup": false,
+    "admins": [],
+    "bannedUsers": [],
+    "streets": []
+  }
+]
