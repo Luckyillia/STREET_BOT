@@ -14,11 +14,7 @@ async function start(ctx) {
     if (isGroupChat) {
       const adminsData = await ctx.telegram.getChatAdministrators(chatId);
       admins = adminsData.map(admin => {
-        return {
-          id: admin.user.id,
-          isBot: admin.user.is_bot,
-          first_name: admin.user.first_name
-        };
+        return admin.user;
       });
     }
     // Создаем объект для хранения информации о чате

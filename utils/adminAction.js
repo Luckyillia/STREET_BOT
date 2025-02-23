@@ -45,7 +45,7 @@ async function muteUser(ctx) {
     }
 
     let targetUser = ctx.message.reply_to_message?.from;
-
+    console.log(targetUser);
     // Проверка на администратора
     if (chatData.admins.some(admin => admin.id === targetUser.id)) {
       return ctx.reply('⚠ Вы не можете замутить администратора.');
@@ -104,7 +104,7 @@ async function addAdmin(ctx) {
     }
 
     let newAdmin = ctx.message.reply_to_message?.from;
-
+    console.log(newAdmin);
     if (chatData.admins.some(admin => admin.id === newAdmin.id)) {
       return ctx.reply('⚠ Этот пользователь уже администратор.');
     }
@@ -181,7 +181,7 @@ async function showBannedUsers(ctx) {
 
     let bannedList = 'Список замученных пользователей:\n';
     chatData.bannedUsers.forEach(user => {
-      bannedList += `• ${user.first_name} (ID: ${user.id})\n`;
+      bannedList += `• ${user.first_name} = ${user.username} (ID: ${user.id})\n`;
     });
 
     return ctx.reply(bannedList);
