@@ -17,9 +17,41 @@ async function isAdmin(ctx) {
 
 function parseDate(dateString) {
     const [datePart, timePart] = dateString.split(', ');
-    const [day, month, year] = datePart.split('.');
-    const [hours, minutes, seconds] = timePart.split(':');
-    return new Date(year, month - 1, day, hours, minutes, seconds);
+
+    let day, month, year, hours, minutes, seconds;
+
+    // Проверяем формат даты
+    if (datePart.includes('/')) {
+        // Американский формат: MM/DD/YYYY
+        [month, day, year] = datePart.split('/').map(Number);
+    } else if (datePart.includes('.')) {
+        // Европейский формат: DD.MM.YYYY
+        [day, month, year] = datePart.split('.').map(Number);
+    } else if (datePart.includes('-')) {
+        // Формат: YYYY-MM-DD
+        [year, month, day] = datePart.split('-').map(Number);
+    } else {
+        throw new Error('Неверный формат даты');
+    }
+
+    let [time, modifier] = timePart.split(' ');
+    [hours, minutes, seconds] = time.split(':').map(Number);
+
+    if (modifier) {
+        if (modifier === 'PM' && hours < 12) {
+            hours += 12;
+        }
+        if (modifier === 'AM' && hours === 12) {
+            hours = 0;
+        }
+    }
+
+    const parsedDate = new Date(year, month - 1, day, hours, minutes, seconds);
+
+    if (isNaN(parsedDate.getTime())) {
+        throw new Error('Неверный формат даты или времени');
+    }
+    return parsedDate;
 }
 
 async function checkStreetStatus(bot) {
