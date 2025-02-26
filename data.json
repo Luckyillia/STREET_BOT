@@ -12,13 +12,6 @@
         "username": "street_checker_bot"
       },
       {
-        "id": 677128727,
-        "is_bot": false,
-        "first_name": "Илюша",
-        "username": "Lucky_illia",
-        "language_code": "uk"
-      },
-      {
         "id": 7396497011,
         "is_bot": false,
         "first_name": "Удалённый аккаунт"
@@ -38,18 +31,74 @@
     "bannedUsers": [],
     "streets": [
       {
-        "name": "Незнаю",
-        "status": "open",
-        "dateClosed": null
+        "name": "Європейська",
+        "status": "open"
+      },
+      {
+        "name": "Шевченка",
+        "status": "open"
+      },
+      {
+        "name": "Чумацький Шлях",
+        "status": "open"
+      },
+      {
+        "name": "Великотирнівська",
+        "status": "open"
+      },
+      {
+        "name": "Решетилівська",
+        "status": "open"
+      },
+      {
+        "name": "Зіньківська",
+        "status": "open"
+      },
+      {
+        "name": "Південна",
+        "status": "open"
+      },
+      {
+        "name": "Миру",
+        "status": "open"
+      },
+      {
+        "name": "Вавилова",
+        "status": "open"
+      },
+      {
+        "name": "Лугова",
+        "status": "open"
+      },
+      {
+        "name": "Яківчанська",
+        "status": "open"
+      },
+      {
+        "name": "Шведська Могила",
+        "status": "open"
+      },
+      {
+        "name": "Мстислава",
+        "status": "open"
+      },
+      {
+        "name": "Небесної Сотні",
+        "status": "open"
+      },
+      {
+        "name": "Каденюка",
+        "status": "open"
+      },
+      {
+        "name": "Польська",
+        "status": "closed",
+        "dateClosed": "26.02.2025, 22:11:53"
+      },
+      {
+        "name": "Петлюри",
+        "status": "open"
       }
     ]
-  },
-  {
-    "chatId": 7581079283,
-    "isAdmin": false,
-    "isGroup": false,
-    "admins": [],
-    "bannedUsers": [],
-    "streets": []
   }
 ]

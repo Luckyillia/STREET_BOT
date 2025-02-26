@@ -55,12 +55,6 @@ cron.schedule('*/1 * * * *', () => {
 });
 
 
-bot.launch({
-    polling: {
-        timeout: 30,  // Уменьшите таймаут ожидания ответа от Telegram
-        limit: 100,  // Максимальное количество обновлений за один запрос
-    }
-}
-);
+bot.launch();
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
