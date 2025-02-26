@@ -1,1 +1,55 @@
-[]
+[
+  {
+    "chatId": -1002287588725,
+    "chatName": "Полтавські дороги 🚍",
+    "isAdmin": false,
+    "isGroup": true,
+    "admins": [
+      {
+        "id": 7549523279,
+        "is_bot": true,
+        "first_name": "StreetCheck",
+        "username": "street_checker_bot"
+      },
+      {
+        "id": 677128727,
+        "is_bot": false,
+        "first_name": "Илюша",
+        "username": "Lucky_illia",
+        "language_code": "uk"
+      },
+      {
+        "id": 7396497011,
+        "is_bot": false,
+        "first_name": "Удалённый аккаунт"
+      },
+      {
+        "id": 7581079283,
+        "is_bot": false,
+        "first_name": "Deleted Account"
+      },
+      {
+        "id": 1087968824,
+        "is_bot": true,
+        "first_name": "Group",
+        "username": "GroupAnonymousBot"
+      }
+    ],
+    "bannedUsers": [],
+    "streets": [
+      {
+        "name": "Незнаю",
+        "status": "open",
+        "dateClosed": null
+      }
+    ]
+  },
+  {
+    "chatId": 7581079283,
+    "isAdmin": false,
+    "isGroup": false,
+    "admins": [],
+    "bannedUsers": [],
+    "streets": []
+  }
+]

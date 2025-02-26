@@ -1,4 +1,4 @@
-const { Telegraf, Markup } = require('telegraf');
+const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 
 const getUser = require('./utils/get_user');
@@ -49,12 +49,18 @@ bot.on('text', (ctx) => handleMessage.handleMessage(ctx,userState,adminState));
 
 
 
-cron.schedule('*/30 * * * *', () => {
+cron.schedule('*/1 * * * *', () => {
     console.log('Проверка истекших сроков аренды...');
     func.checkStreetStatus(bot);
 });
 
 
-bot.launch();
+bot.launch({
+    polling: {
+        timeout: 30,  // Уменьшите таймаут ожидания ответа от Telegram
+        limit: 100,  // Максимальное количество обновлений за один запрос
+    }
+}
+);
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));

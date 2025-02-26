@@ -17,10 +17,9 @@ async function isAdmin(ctx) {
 
 function parseDate(dateString) {
     const [datePart, timePart] = dateString.split(', ');
-    const [day, month, year] = datePart.split('.').map(num => parseInt(num, 10));
-    const [hours, minutes] = timePart.split(':').map(num => parseInt(num, 10));
-
-    return new Date(year, month - 1, day, hours, minutes);
+    const [day, month, year] = datePart.split('.');
+    const [hours, minutes, seconds] = timePart.split(':');
+    return new Date(year, month - 1, day, hours, minutes, seconds);
 }
 
 async function checkStreetStatus(bot) {
@@ -43,6 +42,8 @@ async function checkStreetStatus(bot) {
                 }
 
                 const timeDiff = (currentTime - closedTime) / 1000 / 60;
+                console.log(`Проверяем улицу ${street.name} в чате ${chat.chatName}. Текущее время: ${currentTime}, время закрытия: ${closedTime}, разница: ${timeDiff} минут.`);
+
                 if (timeDiff > 30) {
                     street.status = 'open';
                     street.dateClosed = null;
@@ -66,6 +67,9 @@ async function checkStreetStatus(bot) {
 
         if (updated) {
             await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
+            console.log('Файл data.json обновлен.');
+        } else {
+            console.log('Изменений не обнаружено.');
         }
     } catch (error) {
         console.error('Ошибка при проверке статуса улиц:', error);
