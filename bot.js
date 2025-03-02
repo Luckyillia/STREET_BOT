@@ -7,7 +7,7 @@ const adminAction = require('./utils/adminAction');
 const handleMessage = require('./utils/handleMessage');
 const func  = require('./utils/func');
 
-const BOT_TOKEN = '_';
+const BOT_TOKEN = '7549523279:AAF6edsMZUHYFch0po2TG-tEWhdwX3-pDsg';
 const bot = new Telegraf(BOT_TOKEN);
 
 const adminIds = [677128727, 7075398977]; // ID администраторов
