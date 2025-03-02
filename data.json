@@ -80,7 +80,9 @@
       },
       {
         "name": "Мстислава",
-        "status": "open"
+        "status": "open",
+        "note": null,
+        "dateClosed": null
       },
       {
         "name": "Небесної Сотні",
@@ -93,7 +95,8 @@
       {
         "name": "Польська",
         "status": "closed",
-        "dateClosed": "26.02.2025, 22:11:53"
+        "dateClosed": "2.03.2025, 21:47:35",
+        "note": null
       },
       {
         "name": "Петлюри",

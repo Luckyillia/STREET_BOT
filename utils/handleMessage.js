@@ -94,8 +94,9 @@ async function handleCheckStreet(ctx, chatData, input, userState, userId) {
   const statusEmoji = street.status === 'closed' ? '❌' : '✅';
   const statusText = street.status === 'closed' ? 'закрыта' : 'открыта';
   const dateClosedText = street.status === 'closed' && street.dateClosed ? `\n📅 Закрыта: ${street.dateClosed}` : '';
+  const noteText = street.note ? `\n📝 Примечание: ${street.note}` : '';
 
-  await ctx.reply(`🚧 Статус улицы *${street.name}*:\n\n${statusEmoji} Улица *${statusText}*${dateClosedText}`);
+  await ctx.reply(`🚧 Статус улицы *${street.name}*:\n\n${statusEmoji} Улица *${statusText}*${dateClosedText}${noteText}`);
   userState.delete(userId);
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
@@ -105,19 +106,21 @@ async function handleCheckStreet(ctx, chatData, input, userState, userId) {
 
 // Функция для изменения статуса улицы
 async function handleChangeStatus(ctx, chatData, input, userState, userId) {
-  const match = input.match(/(.+)-(закрыта|открыта)/i);
+  const match = input.match(/(.+)-(закрыта|открыта)(?:\((.+)\))?/i);
 
   if (!match) {
-    return await ctx.reply('⚠ Ошибка! Введите данные в правильном формате: *ул. Ленина-закрыта*');
+    return await ctx.reply('⚠ Ошибка! Введите данные в правильном формате: *ул. Ленина-закрыта* или *ул. Ленина-закрыта(ремонт)*');
   }
 
   const streetName = match[1].trim();
   const newStatus = match[2].toLowerCase() === 'закрыта' ? 'closed' : 'open';
+  const note = match[3] ? match[3].trim() : null;
 
   let streetFound = false;
   chatData.streets = chatData.streets.map((street) => {
     if (street.name.toLowerCase() === streetName.toLowerCase()) {
       street.status = newStatus;
+      street.note = note; // Добавляем примечание
       if (newStatus === 'closed') {
         street.dateClosed = new Date().toLocaleString();
       } else {
@@ -132,13 +135,14 @@ async function handleChangeStatus(ctx, chatData, input, userState, userId) {
     return await ctx.reply('❌ Улица не найдена. Проверьте правильность написания.');
   }
 
-  await ctx.reply(`✅ Статус улицы *${streetName}* изменён на *${newStatus === 'closed' ? 'закрыта' : 'открыта'}*!`);
+  await ctx.reply(`✅ Статус улицы *${streetName}* изменён на *${newStatus === 'closed' ? 'закрыта' : 'открыта'}*!` + (note ? `\n📌 Примечание: ${note}` : ''));
   userState.delete(userId);
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
     Markup.keyboard([['📍 Проверить улицу', '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
   );
 }
+
 
 // Функция для добавления улицы
 async function handleAddStreet(ctx, chatData, input, adminState, userId) {

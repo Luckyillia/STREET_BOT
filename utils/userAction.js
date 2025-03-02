@@ -80,7 +80,8 @@ async function listStreet(ctx) {
 
     const streetsList = chatData.streets.map((street, index) => {
       const statusEmoji = street.status === 'closed' ? '❌' : '✅';
-      return `${index + 1}. ${statusEmoji} ${street.name}`;
+      const noteText = street.note ? ` (📝 ${street.note})` : '';
+      return `${index + 1}. ${statusEmoji} ${street.name}${noteText}`;
     }).join('\n');
 
     await ctx.reply(
@@ -92,6 +93,7 @@ async function listStreet(ctx) {
     await ctx.reply('❗ Ошибка загрузки данных. Попробуйте позже.');
   }
 }
+
 
 async function backToMain(ctx, userState){
   await ctx.reply(
@@ -115,9 +117,9 @@ async function checkState(ctx,userState){
 
 async function editState(ctx, userState){
   await ctx.reply(
-    'Пожалуйста ответьте мне на это собщение\n\n' +
-    '✍ Введите улицу и новый статус в формате:\n\n' +
-    '📌 Пример: *Кремлевская-закрыта* или *просп. Победы-открыта*',
+    'Пожалуйста, ответьте мне на это сообщение\n\n' +
+    '✍ Введите улицу, новый статус и (при необходимости) примечание в формате:\n\n' +
+    '📌 Пример: *Кремлевская-закрыта(ремонт)* или *просп. Победы-открыта*',
     Markup.keyboard([['🔙 Вернуться в главное меню']]).resize()
   );
 
