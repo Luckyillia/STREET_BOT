@@ -79,6 +79,7 @@ async function checkStreetStatus(bot) {
                 if (timeDiff > 30) {
                     street.status = 'open';
                     street.dateClosed = null;
+                    street.note = null;
                     updated = true;
 
                     const message = `✅ Улица *${street.name}* была открыта автоматически для чата *${chat.chatName}*, так как прошло больше 30 минут с момента закрытия.`;
