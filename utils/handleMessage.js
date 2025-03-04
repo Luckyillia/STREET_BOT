@@ -114,23 +114,21 @@ async function handleChangeStatus(ctx, chatData, input, userState, userId) {
 
   const streetName = match[1].trim();
   const newStatus = match[2].toLowerCase() === 'закрыта' ? 'closed' : 'open';
-  const note = match[3] ? match[3].trim() : null;
+  let note = match[3] ? match[3].trim() : null;
+
+  // Ограничение примечания до 12 символов
+  if (note && note.length > 12) {
+    return await ctx.reply('⚠ Примечание не должно превышать 12 символов.');
+  }
 
   let streetFound = false;
-  chatData.streets = chatData.streets.map((street) => {
+  chatData.streets.forEach((street) => {
     if (street.name.toLowerCase() === streetName.toLowerCase()) {
       street.status = newStatus;
-      if(note <= 12){
-        street.note = note; // Добавляем примечание
-        if (newStatus === 'closed') {
-          street.dateClosed = new Date().toLocaleString();
-        } else {
-          street.dateClosed = null;
-        }
-        streetFound = true;
-      }
+      street.note = note;
+      street.dateClosed = newStatus === 'closed' ? new Date().toLocaleString('ru-RU') : null;
+      streetFound = true;
     }
-    return street;
   });
 
   if (!streetFound) {
@@ -139,6 +137,7 @@ async function handleChangeStatus(ctx, chatData, input, userState, userId) {
 
   await ctx.reply(`✅ Статус улицы *${streetName}* изменён на *${newStatus === 'closed' ? 'закрыта' : 'открыта'}*!` + (note ? `\n📌 Примечание: ${note}` : ''));
   userState.delete(userId);
+
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
     Markup.keyboard([['📍 Проверить улицу', '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()

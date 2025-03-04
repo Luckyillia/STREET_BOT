@@ -49,7 +49,7 @@ bot.on('text', (ctx) => handleMessage.handleMessage(ctx,userState,adminState));
 
 
 
-cron.schedule('*/1 * * * *', () => {
+cron.schedule('*/15 * * * *', () => {
     console.log('Проверка истекших сроков аренды...');
     func.checkStreetStatus(bot);
 });
