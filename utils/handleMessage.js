@@ -120,13 +120,15 @@ async function handleChangeStatus(ctx, chatData, input, userState, userId) {
   chatData.streets = chatData.streets.map((street) => {
     if (street.name.toLowerCase() === streetName.toLowerCase()) {
       street.status = newStatus;
-      street.note = note; // Добавляем примечание
-      if (newStatus === 'closed') {
-        street.dateClosed = new Date().toLocaleString();
-      } else {
-        street.dateClosed = null;
+      id(note <= 12){
+        street.note = note; // Добавляем примечание
+        if (newStatus === 'closed') {
+          street.dateClosed = new Date().toLocaleString();
+        } else {
+          street.dateClosed = null;
+        }
+        streetFound = true;
       }
-      streetFound = true;
     }
     return street;
   });
