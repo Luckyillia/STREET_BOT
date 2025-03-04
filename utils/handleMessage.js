@@ -120,7 +120,7 @@ async function handleChangeStatus(ctx, chatData, input, userState, userId) {
   chatData.streets = chatData.streets.map((street) => {
     if (street.name.toLowerCase() === streetName.toLowerCase()) {
       street.status = newStatus;
-      id(note <= 12){
+      if(note <= 12){
         street.note = note; // Добавляем примечание
         if (newStatus === 'closed') {
           street.dateClosed = new Date().toLocaleString();
