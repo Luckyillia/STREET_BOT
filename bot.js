@@ -33,6 +33,8 @@ bot.command('remove_admin', (ctx) => adminAction.removeAdmin(ctx));
 
 bot.command('showAdmins', (ctx) => adminAction.showAdmins(ctx));
 
+bot.command('dislike', (ctx) => userAction.dislike(ctx));
+
 bot.hears('📋 Список перекрытых улиц', (ctx) => userAction.listStreet(ctx));
 
 bot.hears('🔙 Вернуться в главное меню', (ctx) => userAction.backToMain(ctx, userState));
@@ -54,6 +56,10 @@ cron.schedule('*/15 * * * *', () => {
     func.checkStreetStatus(bot);
 });
 
+cron.schedule('0 0 * * *', () => {
+    console.log('🔄 Сброс репутации...');
+    func.resetDislikes();
+});
 
 bot.launch();
 process.once('SIGINT', () => bot.stop('SIGINT'));

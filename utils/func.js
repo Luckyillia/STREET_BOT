@@ -109,7 +109,26 @@ async function checkStreetStatus(bot) {
     }
 }
 
+async function resetDislikes() {
+    try {
+        const data = await fs.promises.readFile('data.json', 'utf8');
+        let chats = JSON.parse(data);
+
+        chats.forEach(chat => {
+            if (chat.dislikes) {
+                chat.dislikes = {}; // Очищаем дизлайки
+            }
+        });
+
+        await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
+        console.log('✅ Репутация сброшена.');
+    } catch (error) {
+        console.error('❌ Ошибка при очистке репутации:', error);
+    }
+}
+
 module.exports = {
     isAdmin,
-    checkStreetStatus
+    checkStreetStatus,
+    resetDislikes
 };
