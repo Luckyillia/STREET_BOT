@@ -19,6 +19,10 @@ bot.start((ctx) => userAction.start(ctx));
 
 bot.command('admin', (ctx) => adminAction.adminAction(ctx,adminState,adminIds));
 
+bot.command('addStreet', (ctx) => adminAction.addStreetFromChat(ctx));
+
+bot.command('removeStreet', (ctx) => adminAction.removeStreetFromChat(ctx));
+
 bot.command('get_users', (ctx) => getUser.get_user(ctx));
 
 bot.command('mute', (ctx) => adminAction.muteUser(ctx));
@@ -51,7 +55,7 @@ bot.on('text', (ctx) => handleMessage.handleMessage(ctx,userState,adminState));
 
 
 
-cron.schedule('*/15 * * * *', () => {
+cron.schedule('*/1 * * * *', () => {
     console.log('Проверка истекших сроков аренды...');
     func.checkStreetStatus(bot);
 });

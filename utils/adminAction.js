@@ -3,7 +3,7 @@ const fs = require('fs');
 const func = require('./func');
 
 async function adminAction(ctx, adminState) {
-  if (!(await func.isAdmin(ctx))) {
+  if (!(await func.isAdmin(ctx, ctx.chat.id))) {
     return ctx.reply('🚫 У вас нет доступа к админ-панели.');
   }
 
@@ -15,7 +15,7 @@ async function adminAction(ctx, adminState) {
 }
 
 async function addStreet(ctx, adminState) {
-  if (!(await func.isAdmin(ctx))) return;
+  if (!(await func.isAdmin(ctx, ctx.chat.id))) return;
 
   adminState.set(ctx.from.id, 'adding_street');
   await ctx.reply(
@@ -25,7 +25,7 @@ async function addStreet(ctx, adminState) {
 }
 
 async function deleteStreet(ctx, adminState) {
-  if (!(await func.isAdmin(ctx))) return;
+  if (!(await func.isAdmin(ctx, ctx.chat.id))) return;
 
   adminState.set(ctx.from.id, 'removing_street');
   await ctx.reply(
@@ -38,27 +38,22 @@ async function muteUser(ctx) {
   try {
     const data = await fs.promises.readFile('data.json', 'utf8');
     const chats = JSON.parse(data);
-    const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
+    const chatData = chats[ctx.chat.id];
 
-    if (!chatData || !(await func.isAdmin(ctx))) {
+    if (!chatData || !(await func.isAdmin(ctx, ctx.chat.id))) {
       return ctx.reply('🚫 У вас нет прав для выполнения этой команды.');
     }
 
-    let targetUser = ctx.message.reply_to_message?.from;
-    console.log(targetUser);
-    // Проверка на администратора
+    const targetUser = ctx.message.reply_to_message?.from;
     if (chatData.admins.some(admin => admin.id === targetUser.id)) {
       return ctx.reply('⚠ Вы не можете замутить администратора.');
     }
 
-    // Проверяем, не в муте ли уже пользователь
-    const isBanned = chatData.bannedUsers.some(user => user.id === targetUser.id);
-    if (isBanned) {
+    if (chatData.bannedUsers.includes(targetUser.id)) {
       return ctx.reply('🚫 Этот пользователь уже в муте.');
     }
 
-    // Добавляем пользователя в мут
-    chatData.bannedUsers.push(targetUser);
+    chatData.bannedUsers.push(targetUser.id);
     await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
     return ctx.reply(`✅ Пользователь ${targetUser.first_name} был замучен.`);
   } catch (error) {
@@ -71,96 +66,23 @@ async function unmuteUser(ctx) {
   try {
     const data = await fs.promises.readFile('data.json', 'utf8');
     const chats = JSON.parse(data);
-    const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
+    const chatData = chats[ctx.chat.id];
 
-    if (!chatData || !(await func.isAdmin(ctx))) {
+    if (!chatData || !(await func.isAdmin(ctx, ctx.chat.id))) {
       return ctx.reply('🚫 У вас нет прав.');
     }
 
-    let targetUser = ctx.message.reply_to_message?.from;
+    const targetUser = ctx.message.reply_to_message?.from;
 
-
-    if (chatData.bannedUsers.some(user => user.id === targetUser.id)) {
-      chatData.bannedUsers = chatData.bannedUsers.filter(user => user.id !== targetUser.id);
+    if (chatData.bannedUsers.includes(targetUser.id)) {
+      chatData.bannedUsers = chatData.bannedUsers.filter(id => id !== targetUser.id);
       await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
       return ctx.reply(`🔊 Пользователь ${targetUser.first_name} был размучен.`);
-    } else {
+    } 
       return ctx.reply('⚠ Этот пользователь не в муте.');
-    }
+    
   } catch (error) {
     console.error('Ошибка при размуте пользователя:', error);
-    ctx.reply('❗ Произошла ошибка.');
-  }
-}
-
-async function addAdmin(ctx) {
-  try {
-    const data = await fs.promises.readFile('data.json', 'utf8');
-    const chats = JSON.parse(data);
-    const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
-
-    if (!chatData || !(await func.isAdmin(ctx))) {
-      return ctx.reply('🚫 У вас нет прав.');
-    }
-
-    let newAdmin = ctx.message.reply_to_message?.from;
-    console.log(newAdmin);
-    if (chatData.admins.some(admin => admin.id === newAdmin.id)) {
-      return ctx.reply('⚠ Этот пользователь уже администратор.');
-    }
-
-    chatData.admins.push(newAdmin);
-    await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
-    return ctx.reply(`✅ ${newAdmin.first_name} теперь администратор.`);
-  } catch (error) {
-    console.error('Ошибка при добавлении администратора:', error);
-    ctx.reply('❗ Произошла ошибка.');
-  }
-}
-
-async function removeAdmin(ctx) {
-  try {
-    const data = await fs.promises.readFile('data.json', 'utf8');
-    const chats = JSON.parse(data);
-    const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
-
-    if (!chatData || !(await func.isAdmin(ctx))) {
-      return ctx.reply('🚫 У вас нет прав.');
-    }
-
-    let removeAdmin = ctx.message.reply_to_message?.from;
-
-    chatData.admins = chatData.admins.filter(admin => admin.id !== removeAdmin.id);
-    await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
-    return ctx.reply(`✅ ${removeAdmin.first_name} больше не администратор.`);
-  } catch (error) {
-    console.error('Ошибка при удалении администратора:', error);
-    ctx.reply('❗ Произошла ошибка.');
-  }
-}
-
-async function showAdmins(ctx) {
-  try {
-    const data = await fs.promises.readFile('data.json', 'utf8');
-    const chats = JSON.parse(data);
-    const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
-
-    if (!chatData || !(await func.isAdmin(ctx))) {
-      return ctx.reply('🚫 У вас нет прав для выполнения этой команды.');
-    }
-
-    if (chatData.admins.length === 0) {
-      return ctx.reply('⚠ В этом чате нет администраторов.');
-    }
-
-    let adminList = 'Список администраторов:\n';
-    chatData.admins.forEach(admin => {
-      adminList += `• ${admin.first_name} (ID: ${admin.id})\n`;
-    });
-
-    return ctx.reply(adminList);
-  } catch (error) {
-    console.error('Ошибка при выводе списка администраторов:', error);
     ctx.reply('❗ Произошла ошибка.');
   }
 }
@@ -169,9 +91,9 @@ async function showBannedUsers(ctx) {
   try {
     const data = await fs.promises.readFile('data.json', 'utf8');
     const chats = JSON.parse(data);
-    const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
+    const chatData = chats[ctx.chat.id];
 
-    if (!chatData || !(await func.isAdmin(ctx))) {
+    if (!chatData || !(await func.isAdmin(ctx, ctx.chat.id))) {
       return ctx.reply('🚫 У вас нет прав для выполнения этой команды.');
     }
 
@@ -180,14 +102,118 @@ async function showBannedUsers(ctx) {
     }
 
     let bannedList = 'Список замученных пользователей:\n';
-    chatData.bannedUsers.forEach(user => {
-      bannedList += `• ${user.first_name} = ${user.username} (ID: ${user.id})\n`;
+    chatData.bannedUsers.forEach(userId => {
+      bannedList += `• ID: ${userId}\n`;
     });
 
     return ctx.reply(bannedList);
   } catch (error) {
     console.error('Ошибка при выводе списка замученных пользователей:', error);
     ctx.reply('❗ Произошла ошибка.');
+  }
+}
+
+async function addStreetFromChat(ctx){
+  const text = ctx.message.text.trim();
+
+  // Проверка команды /add-street chat-id street-name
+  const regex = /^\/addStreet (-?\d+) (.+)$/;
+  const match = text.match(regex);
+
+  if (match) {
+    const chatId = match[1];
+    const streetName = match[2];
+
+    // Проверяем, является ли пользователь администратором в этом чате
+    const isAdminInChat = await func.isAdmin(ctx, chatId);
+    if (!isAdminInChat) {
+      return ctx.reply('🚫 У вас нет прав администратора в этом чате.');
+    }
+
+    try {
+      // Чтение данных из файла
+      const data = await fs.promises.readFile('data.json', 'utf8');
+      const chats = JSON.parse(data);
+
+      if (!chats[chatId]) {
+        return ctx.reply('⚠ Чат с таким ID не найден.');
+      }
+
+      const chat = chats[chatId];
+      if (!Array.isArray(chat.streets)) {
+        chat.streets = [];
+      }
+
+      // Добавляем улицу в список
+      chat.streets.push({
+        name: streetName,
+        status: 'open',
+        dateClosed: null,
+        note: null
+      });
+
+      // Сохраняем данные обратно в файл
+      await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
+      return ctx.reply(`✅ Улица "${streetName}" была добавлена в чат ${chat.chatName}.`);
+    } catch (error) {
+      console.error('Ошибка при добавлении улицы:', error);
+      ctx.reply('❗ Произошла ошибка при добавлении улицы.');
+    }
+  } else {
+    ctx.reply('❌ Неверный формат команды. Используйте: /addStreet chat-id street-name');
+  }
+}
+
+
+async function removeStreetFromChat(ctx) {
+  const text = ctx.message.text.trim();
+
+  // Проверка команды /removeStreet chat-id street-name
+  const regex = /^\/removeStreet (-?\d+) (.+)$/;
+  const match = text.match(regex);
+
+  if (match) {
+    const chatId = match[1]; // ID чата (может быть отрицательным)
+    const streetName = match[2]; // Название улицы
+
+    // Проверяем, является ли пользователь администратором в этом чате
+    const isAdminInChat = await func.isAdmin(ctx, chatId);
+    if (!isAdminInChat) {
+      return ctx.reply('🚫 У вас нет прав администратора в этом чате.');
+    }
+
+    try {
+      // Чтение данных из файла
+      const data = await fs.promises.readFile('data.json', 'utf8');
+      const chats = JSON.parse(data);
+
+      if (!chats[chatId]) {
+        return ctx.reply('⚠ Чат с таким ID не найден.');
+      }
+
+      const chat = chats[chatId];
+      if (!Array.isArray(chat.streets)) {
+        return ctx.reply('⚠ В этом чате нет списка улиц.');
+      }
+
+      // Ищем улицу для удаления
+      const streetIndex = chat.streets.findIndex(street => street.name === streetName);
+      if (streetIndex === -1) {
+        return ctx.reply(`⚠ Улица "${streetName}" не найдена в чате.`);
+      }
+
+      // Удаляем улицу из списка
+      chat.streets.splice(streetIndex, 1);
+
+      // Сохраняем данные обратно в файл
+      await fs.promises.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
+      return ctx.reply(`✅ Улица "${streetName}" была удалена из чата ${chat.chatName}.`);
+    } catch (error) {
+      console.error('Ошибка при удалении улицы:', error);
+      ctx.reply('❗ Произошла ошибка при удалении улицы.');
+    }
+  } else {
+    ctx.reply('❌ Неверный формат команды. Используйте: /removeStreet chat-id street-name');
   }
 }
 
@@ -198,8 +224,7 @@ module.exports = {
   deleteStreet,
   muteUser,
   unmuteUser,
-  addAdmin,
-  removeAdmin,
-  showAdmins,
-  showBannedUsers
+  showBannedUsers,
+  addStreetFromChat,
+  removeStreetFromChat
 };

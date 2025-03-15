@@ -8,22 +8,22 @@ async function loadData() {
     return JSON.parse(data);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
-    return [];
+    return {};
   }
 }
 
 // Функция для сохранения данных в файл
-async function saveData(chats) {
+async function saveData(data) {
   try {
-    await fs.writeFile('data.json', JSON.stringify(chats, null, 2), 'utf8');
+    await fs.writeFile('data.json', JSON.stringify(data, null, 2), 'utf8');
   } catch (error) {
     console.error('Ошибка при сохранении данных:', error);
   }
 }
 
 // Функция для поиска чата по ID
-function findChat(chats, chatId) {
-  return chats.find(chat => chat.chatId === chatId);
+function findChat(data, chatId) {
+  return data[chatId];
 }
 
 // Функция для проверки, замучен ли пользователь
@@ -33,7 +33,7 @@ function isUserBanned(chatData, userId) {
 
 // Основная функция обработки сообщений
 async function handleMessage(ctx, userState, adminState) {
-  const chatId = ctx.chat.id;
+  const chatId = ctx.chat.id.toString();  // Чат ID как строка
   const userId = ctx.from.id;
   const input = ctx.message.text.trim();
   const state = userState.get(userId);
@@ -41,19 +41,20 @@ async function handleMessage(ctx, userState, adminState) {
 
   try {
     // Загружаем данные
-    const chats = await loadData();
-    let chatData = findChat(chats, chatId);
+    const data = await loadData();
+    let chatData = findChat(data, chatId);
 
     // Если чат не найден, создаем новый
     if (!chatData) {
       chatData = {
-        chatId: chatId,
+        chatName: ctx.chat.title || 'Неизвестный чат',
         isAdmin: false,
+        isGroup: ctx.chat.type === 'group',
         admins: [],
         bannedUsers: [],
         streets: []
       };
-      chats.push(chatData);
+      data[chatId] = chatData;
     }
 
     // Проверка на мут
@@ -76,7 +77,7 @@ async function handleMessage(ctx, userState, adminState) {
     }
 
     // Сохраняем данные после изменений
-    await saveData(chats);
+    await saveData(data);
   } catch (error) {
     console.error('Ошибка в обработке сообщения:', error);
     await ctx.reply('❗ Произошла ошибка при обработке вашего запроса. Попробуйте позже.');
@@ -100,7 +101,7 @@ async function handleCheckStreet(ctx, chatData, input, userState, userId) {
   userState.delete(userId);
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
-    Markup.keyboard([['📍 Проверить улицу', '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
+    Markup.keyboard([[ '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
   );
 }
 
@@ -140,10 +141,9 @@ async function handleChangeStatus(ctx, chatData, input, userState, userId) {
 
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
-    Markup.keyboard([['📍 Проверить улицу', '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
+    Markup.keyboard([[ '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
   );
 }
-
 
 // Функция для добавления улицы
 async function handleAddStreet(ctx, chatData, input, adminState, userId) {
@@ -157,7 +157,7 @@ async function handleAddStreet(ctx, chatData, input, adminState, userId) {
   adminState.delete(userId);
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
-    Markup.keyboard([['📍 Проверить улицу', '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
+    Markup.keyboard([['📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
   );
 }
 
@@ -173,7 +173,7 @@ async function handleRemoveStreet(ctx, chatData, input, adminState, userId) {
   adminState.delete(userId);
   await ctx.reply(
     '🏠 Главное меню. Выберите действие:',
-    Markup.keyboard([['📍 Проверить улицу', '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
+    Markup.keyboard([[ '📋 Список перекрытых улиц', '🚦 Изменить статус улицы']]).resize()
   );
 }
 

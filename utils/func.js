@@ -1,19 +1,30 @@
 const fs = require('fs');
 
-async function isAdmin(ctx) {
+async function isAdmin(ctx, chatId) {
     try {
         const data = await fs.promises.readFile('data.json', 'utf8');
         const chats = JSON.parse(data);
-        const chatData = chats.find(chat => chat.chatId === ctx.chat.id);
 
-        if (!chatData || !Array.isArray(chatData.admins)) return false;
+        // Проверяем, что chatId существует
+        if (!chatId) {
+            console.error('Не удалось получить ID чата');
+            return false;
+        }
 
+        const chatData = chats[chatId]; // Используем переданный chatId для поиска данных о чате
+
+        if (!chatData || !Array.isArray(chatData.admins)) {
+            return false;
+        }
+
+        // Проверяем, является ли пользователь администратором
         return chatData.admins.some(admin => admin.id === ctx.from.id);
     } catch (error) {
-        console.error('Ошибка проверки администратора:', error);
+        console.error('Ошибка при проверке администратора:', error);
         return false;
     }
 }
+
 
 function parseDate(dateString) {
     const [datePart, timePart] = dateString.split(', ');
@@ -61,7 +72,9 @@ async function checkStreetStatus(bot) {
         const currentTime = new Date();
         let updated = false;
 
-        for (const chat of chats) {
+        // Перебор чатов
+        for (const chatId in chats) {
+            const chat = chats[chatId];
             if (!Array.isArray(chat.streets) || chat.streets.length === 0) continue;
 
             for (const street of chat.streets) {
@@ -114,7 +127,7 @@ async function resetDislikes() {
         const data = await fs.promises.readFile('data.json', 'utf8');
         let chats = JSON.parse(data);
 
-        chats.forEach(chat => {
+        Object.values(chats).forEach(chat => {
             if (chat.dislikes) {
                 chat.dislikes = {}; // Очищаем дизлайки
             }

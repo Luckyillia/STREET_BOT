@@ -1,6 +1,5 @@
-[
-  {
-    "chatId": -1002287588725,
+{
+  "-1002287588725": {
     "chatName": "Полтавські дороги 🚍",
     "isAdmin": false,
     "isGroup": true,
@@ -94,8 +93,8 @@
       },
       {
         "name": "Польська",
-        "status": "closed",
-        "dateClosed": "2.03.2025, 21:47:35",
+        "status": "open",
+        "dateClosed": null,
         "note": null
       },
       {
@@ -103,5 +102,13 @@
         "status": "open"
       }
     ]
+  },
+  "7581079283": {
+    "chatName": "Неизвестный чат",
+    "isAdmin": false,
+    "isGroup": false,
+    "admins": [],
+    "bannedUsers": [],
+    "streets": []
   }
-]
+}
